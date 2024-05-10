@@ -1,0 +1,26 @@
+# Dependências
+node_modules/
+
+# Arquivos de compilação TypeScript
+dist/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos específicos do ambiente de desenvolvimento
+.env
+.env.local
+*.lock
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Diretórios de cache
+.cache/
+.tmp/
