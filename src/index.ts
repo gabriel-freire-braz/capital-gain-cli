@@ -30,21 +30,37 @@ program
             const arrayStrings: string[] = correctedString.split('|');
 
 
-            // percorre cada lista de operação
+            // percorre cada lista/linha de operação (cada iteração tem lógica independente) ----------------
             for (let i = 0; i < arrayStrings.length; i++) {
             
                 // Converter cada string de array JSON em um array de objetos JavaScript
                 const operationsArr = JSON.parse(arrayStrings[i]);
+                let taxesArr: Record<string, number>[] = [];
 
-                // percorre cada operação (objeto)
-                for (const v of operationsArr) {
+
+                // percorre cada operação (objeto) ----------------
+                for (const operationObj of operationsArr) {
                     
-                    // identifica cada propriedade (operation, unit-cost, quantity)
-                    const operation: string = v['operation']
-                    const unit_cost: number = v['unit-cost']
-                    const quantity: number = v['quantity']
+                    let tax: number = 0;
 
+                    // identifica cada propriedade (operation, unit-cost, quantity)
+                    const operation: string = operationObj['operation']
+                    const unit_cost: number = operationObj['unit-cost']
+                    const quantity: number = operationObj['quantity']
+
+
+                    if (operation === 'sell') {
+
+
+                    }
+
+
+                    taxesArr.push( { tax } );
+                    // console.log(operation,unit_cost,quantity)
                 }
+
+
+                console.dir(taxesArr)
 
                 // executar funcao aqui para todos os casos de uso
                 // data_stdout = operationsArr
