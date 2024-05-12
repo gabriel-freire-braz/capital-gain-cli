@@ -30,11 +30,21 @@ program
             const arrayStrings: string[] = correctedString.split('|');
 
 
+            // percorre cada lista de operação
             for (let i = 0; i < arrayStrings.length; i++) {
             
                 // Converter cada string de array JSON em um array de objetos JavaScript
                 const operationsArr = JSON.parse(arrayStrings[i]);
-                console.dir(operationsArr[1].operation)
+
+                // percorre cada operação (objeto)
+                for (const v of operationsArr) {
+                    
+                    // identifica cada propriedade (operation, unit-cost, quantity)
+                    const operation: string = v['operation']
+                    const unit_cost: number = v['unit-cost']
+                    const quantity: number = v['quantity']
+
+                }
 
                 // executar funcao aqui para todos os casos de uso
                 // data_stdout = operationsArr
