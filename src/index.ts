@@ -37,8 +37,14 @@ program
                 const operationsArr = JSON.parse(arrayStrings[i]);
                 let taxesArr: Record<string, number>[] = [];
 
+                let currentBuy = 0;
+                let averegeBuy = 0;
 
-                // percorre cada operação (objeto) ----------------
+                let currentLoss = 0; // x <= 0
+                let currentProfit = 0; // x >= 0
+
+
+                // percorre cada objeto da operação ----------------
                 for (const operationObj of operationsArr) {
                     
                     let tax: number = 0;
@@ -48,10 +54,32 @@ program
                     const unit_cost: number = operationObj['unit-cost']
                     const quantity: number = operationObj['quantity']
 
+                    const operation_cost = unit_cost * quantity
 
-                    if (operation === 'sell') {
+                    if (operation === 'sell' && operation_cost > 20000) {
+                      
+                        // calcula imposto aqui
 
 
+                    } else if(operation === 'buy') {
+                        currentBuy++;
+
+                        console.log(currentBuy)
+
+                        if (currentBuy > 1) {
+                            // faz calculo de media ponderada
+                            // for (let j = 1; j <= currentBuy; j++) {
+
+                            //     const a = operationsArr[j-1];
+
+                            //     console.dir(a)
+
+                            //     // averegeBuy = a
+                            // }
+
+                        } else {
+                            averegeBuy = unit_cost; // se teve 1 compra, considerar esta como base para calculo
+                        }
                     }
 
 
@@ -60,7 +88,10 @@ program
                 }
 
 
-                console.dir(taxesArr)
+                // --------- PRINT STDOUT
+                // console.dir(taxesArr)
+
+
 
                 // executar funcao aqui para todos os casos de uso
                 // data_stdout = operationsArr
