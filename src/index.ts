@@ -40,7 +40,7 @@ program
                 let currentBuy = 0;
                 let averegeBuy = 0;
 
-                let preventLoss = 0; // x >= 0
+                // let preventLoss = 0; // x >= 0
                 let currentLoss = 0; // x <= 0
                 let currentProfit = 0; // x >= 0
 
@@ -58,38 +58,40 @@ program
                     const operation_cost = unit_cost * quantity
                     
                     if (operation === 'sell' && operation_cost > 20000) {
-                      
-                        // calcula prejuizo anterior (se houver)
+                        
 
                         // calcula lucro ou prejuizo considerando prejuizo anterior                        
                         if (unit_cost > averegeBuy) {
                             // se lucro
-
+                            
+                            // calcula lucro
                             const operation_buy = averegeBuy * quantity
                             const operation_sell = unit_cost * quantity
 
-                            // calcula lucro
                             const profit = operation_sell - operation_buy
+                            const real_profit = profit - currentLoss  // subtrai prejuizo anterior (se houver)
 
                             // calcula imposto (20% do lucro)
-                            tax = (profit * 20) / 100
+                            tax = (real_profit * 20) / 100
 
-                            // console.log('operation_buy: '+operation_buy)
-                            // console.log('operation_sell: '+operation_sell)
-                            console.log('teve lucro: R$'+profit)
+                            console.log('teve lucro: R$'+real_profit)
 
                         } else if (unit_cost < averegeBuy) {
                             // se prejuizo
-                            console.log('teve prejuizo')
+                            
+                            const operation_buy = averegeBuy * quantity
+                            const operation_sell = unit_cost * quantity
+                            
+                            currentLoss = operation_buy - operation_sell
+
+                            tax = 0 // nao paga imposto
+
+                            console.log('teve prejuizo: '+currentLoss)
 
                         } else {
                             // se nao ha lucro e nem prejuizo
                             console.log('nao teve prejuizo e nem lucro')
                         }
-
-                        // calcula imposto aqui
-
-
 
 
 
