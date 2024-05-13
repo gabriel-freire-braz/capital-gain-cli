@@ -57,7 +57,7 @@ program
 
                     const operation_cost = unit_cost * quantity
                     
-                    if (operation === 'sell' && operation_cost > 20000) {
+                    if (operation === 'sell') {
 
                         // calcula operacao de venda e compra
                         const operation_buy = averegeBuyPrice * quantity
@@ -70,12 +70,17 @@ program
                             
                             // calcula lucro
                             const profit = operation_sell - operation_buy
-                            const real_profit = profit - currentLoss  // subtrai prejuizo anterior (se houver)
+                            const real_profit = (profit - currentLoss) >= 0 ? profit - currentLoss : 0  // subtrai prejuizo anterior (se houver)
+
+                            // atualiza prejuizo anterior conforme lucro atual
+                            if (profit > 0 && currentLoss > 0) {
+                                currentLoss = (currentLoss > profit) ? currentLoss - profit : 0
+                            }
 
                             // calcula imposto (20% do lucro)
-                            tax = (real_profit * 20) / 100
+                            tax = operation_cost > 20000 ? ((real_profit * 20) / 100) : 0
 
-                            console.log('teve lucro: R$'+real_profit)
+                            console.log('teve lucro real: R$'+real_profit+' lucro: '+profit+ ' prejuizo atual: '+currentLoss+' tax: '+tax)
 
                         } else if (unit_cost < averegeBuyPrice) {
                             // se prejuizo
@@ -83,7 +88,7 @@ program
                             // calcula prejuizo
                             currentLoss = operation_buy - operation_sell
 
-                            tax = 0 // nao paga imposto
+                            tax = 0 // nao paga imposto por duas razões: teve prejuizo e/ou se for menor que 20K de operação
 
                             console.log('teve prejuizo: '+currentLoss)
 
@@ -109,7 +114,7 @@ program
                             averegeBuyPrice = unit_cost
                         }
 
-                        // console.log(`Média ponderada de custo unitário para compras: ${averegeBuyPrice}`);
+                        console.log(`Média ponderada de custo unitário para compras: ${averegeBuyPrice}`);
 
                         /**
                          * 
