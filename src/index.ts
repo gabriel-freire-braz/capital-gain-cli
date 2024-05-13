@@ -40,6 +40,7 @@ program
                 let currentBuy = 0;
                 let averegeBuy = 0;
 
+                let preventLoss = 0; // x >= 0
                 let currentLoss = 0; // x <= 0
                 let currentProfit = 0; // x >= 0
 
@@ -55,17 +56,44 @@ program
                     const quantity: number = operationObj['quantity']
 
                     const operation_cost = unit_cost * quantity
-
+                    
                     if (operation === 'sell' && operation_cost > 20000) {
                       
+                        // calcula prejuizo anterior (se houver)
+
+                        // calcula lucro ou prejuizo considerando prejuizo anterior                        
+                        if (unit_cost > averegeBuy) {
+                            // se lucro
+
+                            const operation_buy = averegeBuy * quantity
+                            const operation_sell = unit_cost * quantity
+
+                            // calcula lucro
+                            const profit = operation_sell - operation_buy
+
+                            // console.log('operation_buy: '+operation_buy)
+                            // console.log('operation_sell: '+operation_sell)
+                            // console.log('teve lucro: R$'+profit)
+
+                        } else if (unit_cost < averegeBuy) {
+                            // se prejuizo
+                            console.log('teve prejuizo')
+
+                        } else {
+                            // se nao ha lucro e nem prejuizo
+                            console.log('nao teve prejuizo e nem lucro')
+                        }
+
                         // calcula imposto aqui
+
+
+
 
 
                     } else if(operation === 'buy') {
                         currentBuy++;
-
-                        console.log(currentBuy)
-
+                        
+                        
                         if (currentBuy > 1) {
                             // faz calculo de media ponderada
                             // for (let j = 1; j <= currentBuy; j++) {
@@ -76,10 +104,12 @@ program
 
                             //     // averegeBuy = a
                             // }
+                            averegeBuy = unit_cost; // temp*
 
                         } else {
                             averegeBuy = unit_cost; // se teve 1 compra, considerar esta como base para calculo
                         }
+
                     }
 
 
