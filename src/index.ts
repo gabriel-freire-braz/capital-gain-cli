@@ -37,8 +37,7 @@ program
                 const operationsArr = JSON.parse(arrayStrings[i]);
                 let taxesArr: Record<string, number>[] = [];
 
-                let currentBuy = 0;
-                let averegeBuy = 0;
+                let averegeBuyPrice = 0;
 
                 // let preventLoss = 0; // x >= 0
                 let currentLoss = 0; // x <= 0
@@ -49,25 +48,27 @@ program
                 for (const operationObj of operationsArr) {
                     
                     let tax: number = 0;
+                    const obj: Transaction = operationObj;
 
                     // identifica cada propriedade (operation, unit-cost, quantity)
-                    const operation: string = operationObj['operation']
-                    const unit_cost: number = operationObj['unit-cost']
-                    const quantity: number = operationObj['quantity']
+                    const operation: string = obj['operation']
+                    const unit_cost: number = obj['unit-cost']
+                    const quantity: number = obj['quantity']
 
                     const operation_cost = unit_cost * quantity
                     
                     if (operation === 'sell' && operation_cost > 20000) {
-                        
+
+                        // calcula operacao de venda e compra
+                        const operation_buy = averegeBuyPrice * quantity
+                        const operation_sell = unit_cost * quantity
 
                         // calcula lucro ou prejuizo considerando prejuizo anterior                        
-                        if (unit_cost > averegeBuy) {
+                        if (unit_cost > averegeBuyPrice) {
+                        // if (operation_buy > operation_sell) {
                             // se lucro
                             
                             // calcula lucro
-                            const operation_buy = averegeBuy * quantity
-                            const operation_sell = unit_cost * quantity
-
                             const profit = operation_sell - operation_buy
                             const real_profit = profit - currentLoss  // subtrai prejuizo anterior (se houver)
 
@@ -76,12 +77,10 @@ program
 
                             console.log('teve lucro: R$'+real_profit)
 
-                        } else if (unit_cost < averegeBuy) {
+                        } else if (unit_cost < averegeBuyPrice) {
                             // se prejuizo
                             
-                            const operation_buy = averegeBuy * quantity
-                            const operation_sell = unit_cost * quantity
-                            
+                            // calcula prejuizo
                             currentLoss = operation_buy - operation_sell
 
                             tax = 0 // nao paga imposto
@@ -94,12 +93,27 @@ program
                         }
 
 
-
                     } else if(operation === 'buy') {
-                        currentBuy++;
+
+                        const buyTransactions = operationsArr.filter((t: any) => t.operation === "buy");
                         
-                        
-                        if (currentBuy > 1) {
+                        // Calcular a média ponderada do custo unitário
+                        const totalQuantity = buyTransactions.reduce((sum: any, t: any) => sum + t.quantity, 0);
+                        const totalCost = buyTransactions.reduce((sum: any, t: any) => sum + (t["unit-cost"] * t.quantity), 0);
+                        const weightedAverageCost = totalQuantity > 0 ? totalCost / totalQuantity : 0;
+
+                        console.log(`Média ponderada de custo unitário para compras: ${weightedAverageCost.toFixed(2)}`);
+
+                        averegeBuyPrice = buyTransactions.length > 1 ? Number(weightedAverageCost.toFixed(2)) : unit_cost
+
+                        /**
+                         * 
+                         * nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-
+                         * atual) + (quantidade-de-acoes * valor-de-compra)) / (quantidade-de-acoes-atual + quantidade-
+                         * de-acoes-compradas)
+                         * 
+                         */
+                        // if (buyTransactions.length > 1) {
                             // faz calculo de media ponderada
                             // for (let j = 1; j <= currentBuy; j++) {
 
@@ -109,11 +123,11 @@ program
 
                             //     // averegeBuy = a
                             // }
-                            averegeBuy = unit_cost; // temp*
+                        //     averegeBuy = unit_cost; // temp*
 
-                        } else {
-                            averegeBuy = unit_cost; // se teve 1 compra, considerar esta como base para calculo
-                        }
+                        // } else {
+                        //     averegeBuy = unit_cost; // se teve 1 compra, considerar esta como base para calculo
+                        // }
 
                     }
 
