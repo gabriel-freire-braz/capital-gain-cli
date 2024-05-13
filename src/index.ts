@@ -4,13 +4,13 @@ import * as fs from 'fs';
 const program = new Command();
 
 
-interface Transaction {
+interface Operation {
     "operation": string;
     "unit-cost": number;
     "quantity": number;
 }
 
-function processTransaction(transaction: Transaction) {
+function processTransaction(transaction: Operation) {
     console.log(`Operation: ${transaction.operation}, Unit Cost: ${transaction["unit-cost"]}, Quantity: ${transaction.quantity}`);
 }
 
@@ -45,10 +45,11 @@ program
 
 
                 // percorre cada objeto da operação ----------------
-                for (const operationObj of operationsArr) {
+                // for (const operationObj of operationsArr) {
+                for (const [keyObj, operationObj] of operationsArr.entries()) {
                     
                     let tax: number = 0;
-                    const obj: Transaction = operationObj;
+                    const obj: Operation = operationObj;
 
                     // identifica cada propriedade (operation, unit-cost, quantity)
                     const operation: string = obj['operation']
@@ -100,7 +101,9 @@ program
 
                     } else if(operation === 'buy') {
 
-                        const buyTransactions = operationsArr.filter((t: any) => t.operation === "buy");
+                        const buyTransactions = operationsArr.filter((t: any, k: number) => {
+                            t.operation === "buy" && keyObj <= k
+                        });
                         
                         if ( buyTransactions.length > 1 ) {
                             
@@ -123,22 +126,6 @@ program
                          * de-acoes-compradas)
                          * 
                          */
-                        // if (buyTransactions.length > 1) {
-                            // faz calculo de media ponderada
-                            // for (let j = 1; j <= currentBuy; j++) {
-
-                            //     const a = operationsArr[j-1];
-
-                            //     console.dir(a)
-
-                            //     // averegeBuy = a
-                            // }
-                        //     averegeBuy = unit_cost; // temp*
-
-                        // } else {
-                        //     averegeBuy = unit_cost; // se teve 1 compra, considerar esta como base para calculo
-                        // }
-
                     }
 
 
