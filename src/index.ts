@@ -71,9 +71,12 @@ program
                             // calcula lucro
                             const profit = operation_sell - operation_buy
 
+                            // calcula imposto (20% do lucro)
+                            tax = (profit * 20) / 100
+
                             // console.log('operation_buy: '+operation_buy)
                             // console.log('operation_sell: '+operation_sell)
-                            // console.log('teve lucro: R$'+profit)
+                            console.log('teve lucro: R$'+profit)
 
                         } else if (unit_cost < averegeBuy) {
                             // se prejuizo
@@ -119,7 +122,7 @@ program
 
 
                 // --------- PRINT STDOUT
-                // console.dir(taxesArr)
+                console.dir(taxesArr)
 
 
 
