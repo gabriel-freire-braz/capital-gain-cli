@@ -113,13 +113,9 @@ program
                         if ( totalBuyTransactions > 1 && balance > 0 ) {
                             
                             // Calcular a média ponderada do custo unitário de cada operacao
-                            // const totalQuantity = buyTransactions.reduce((sum: any, t: any) => sum + t.quantity, 0);
-                            // const totalCost = buyTransactions.reduce((sum: any, t: any) => sum + (t["unit-cost"] * t.quantity), 0);
-                            // const weightedAverageCost = totalQuantity > 0 ? totalCost / totalQuantity : 0;
-
-                            // averegeBuyPrice = Number(weightedAverageCost.toFixed(2))
+                            const weightedAverageCost = ( (balance * averegeBuyPrice) + operation_cost ) / (balance + quantity)
                             
-                            averegeBuyPrice = parseFloat(( ((balance * averegeBuyPrice) + operation_cost) / (balance + quantity) ).toFixed(2))
+                            averegeBuyPrice = parseFloat( weightedAverageCost.toFixed(2) )
                             
                             // console.log( `((${balance} * ${averegeBuyPrice}) + (${quantity} * ${unit_cost})) / (${balance} + ${quantity})` )
                             console.log(`Média ponderada de custo unitário para compras (transacao > 1): ${averegeBuyPrice} - balance: ${balance}`);
@@ -127,7 +123,7 @@ program
                         } else {
                             
                             averegeBuyPrice = unit_cost
-                            console.log(`Média ponderada de custo unitário para compras (transacao = 1): ${averegeBuyPrice} - balance: ${balance}`);
+                            console.log(`Média ponderada de custo unitário para compras (transacao = 1 ou saldo = 0): ${averegeBuyPrice} - balance: ${balance}`);
                         }
 
                         
