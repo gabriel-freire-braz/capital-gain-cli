@@ -1,13 +1,14 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "tsc && node dist/index.js greet",
-    "dev": "nodemon index.ts greet"
+    "cli": "tsc && node dist/index.js process",
+    "cli-dev": "nodemon src/index.ts process"
   },
   "dependencies": {
     "commander": "^12.0.0"
   },
   "devDependencies": {
+    "@types/commander": "^2.12.2",
     "@types/node": "^20.12.11",
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",

@@ -1,9 +1,9 @@
 import { Command } from 'commander';
-import * as readline from 'readline';
-import * as fs from 'fs';
+import { Operation } from './types'
+// import * as readline from 'readline';
+// import * as fs from 'fs';
+
 const program = new Command();
-
-
 
 // function processTransaction(transaction: Operation) {
 //     console.log(`Operation: ${transaction.operation}, Unit Cost: ${transaction["unit-cost"]}, Quantity: ${transaction.quantity}`);
@@ -12,7 +12,7 @@ const program = new Command();
 program
     .version('1.0.0')
     .description("Process JSON data from stdin")
-    // .option('-f, --file <type>', 'Specify the file path for JSON input')
+    .command('process')
     .action((options) => {
 
         let data_stdout: string[] = [];
@@ -107,7 +107,10 @@ program
 
                         if ( totalBuyTransactions > 1 && balance > 0 ) {
                             
+                            //
                             // Calcular a média ponderada do custo unitário de cada operacao
+                            // nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-atual) + (quantidade-de-acoes * valor-de-compra)) / (quantidade-de-acoes-atual + quantidade-de-acoes-compradas)
+                            //
                             const weightedAverageCost = ( (balance * averegeBuyPrice) + operation_cost ) / (balance + quantity)
                             
                             averegeBuyPrice = parseFloat( weightedAverageCost.toFixed(2) )
@@ -123,13 +126,6 @@ program
 
                         
                         balance += quantity;
-
-                        /**
-                         * 
-                         * nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-atual) + (quantidade-de-acoes * valor-de-compra)) 
-                         * / (quantidade-de-acoes-atual + quantidade-de-acoes-compradas)
-                         * 
-                         */
                     }
 
                     taxesArr.push( { tax } );
