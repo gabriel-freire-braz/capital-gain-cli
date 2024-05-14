@@ -102,10 +102,13 @@ program
                     } else if(operation === 'buy') {
 
                         const buyTransactions = operationsArr.filter((t: any, k: number) => {
-                            t.operation === "buy" && keyObj <= k
+                            // console.log(t['unit-cost'],keyObj,k, k <= keyObj && t.operation === "buy")
+                            return t.operation === "buy" && k <= keyObj
                         });
                         
-                        if ( buyTransactions.length > 1 ) {
+                        const totalBuyTransactions = Number(buyTransactions.length)
+
+                        if ( totalBuyTransactions > 1 ) {
                             
                             // Calcular a média ponderada do custo unitário de cada operacao
                             const totalQuantity = buyTransactions.reduce((sum: any, t: any) => sum + t.quantity, 0);
@@ -113,11 +116,15 @@ program
                             const weightedAverageCost = totalQuantity > 0 ? totalCost / totalQuantity : 0;
 
                             averegeBuyPrice = Number(weightedAverageCost.toFixed(2))
-                        } else {
+                            console.log(`Média ponderada de custo unitário para compras (transacao > 1): ${averegeBuyPrice}`);
+
+                        } else if (totalBuyTransactions === 1) {
+                            
                             averegeBuyPrice = unit_cost
+                            console.log(`Média ponderada de custo unitário para compras (transacao = 1): ${averegeBuyPrice}`);
                         }
 
-                        console.log(`Média ponderada de custo unitário para compras: ${averegeBuyPrice}`);
+                        
 
                         /**
                          * 
