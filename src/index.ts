@@ -39,7 +39,7 @@ program
 
                 let averegeBuyPrice = 0; // media ponderada
                 let currentLoss = 0; // saldo de prejuizo              
-                let balance: number = 0; // saldo de compra x venda
+                let balance = 0; // saldo de compra x venda
 
                 // percorre cada objeto da operação ----------------
                 // for (const operationObj of operationsArr) {
@@ -119,7 +119,7 @@ program
 
                             // averegeBuyPrice = Number(weightedAverageCost.toFixed(2))
                             
-                            averegeBuyPrice = ((balance * averegeBuyPrice) + operation_cost) / (balance + quantity)
+                            averegeBuyPrice = parseFloat(( ((balance * averegeBuyPrice) + operation_cost) / (balance + quantity) ).toFixed(2))
                             
                             // console.log( `((${balance} * ${averegeBuyPrice}) + (${quantity} * ${unit_cost})) / (${balance} + ${quantity})` )
                             console.log(`Média ponderada de custo unitário para compras (transacao > 1): ${averegeBuyPrice} - balance: ${balance}`);
