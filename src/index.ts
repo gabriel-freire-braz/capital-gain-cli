@@ -57,9 +57,6 @@ program
                     
                     if (operation === 'sell') {
 
-                        // saldo de acoes
-                        balance = balance - quantity;
-
                         // calcula operacao de venda e compra
                         const operation_buy = averegeBuyPrice * quantity
                         const operation_sell = unit_cost * quantity
@@ -98,10 +95,13 @@ program
                             console.log('nao teve prejuizo e nem lucro')
                         }
 
+                        // saldo de acoes
+                        balance -= quantity;
+                        
 
                     } else if(operation === 'buy') {
 
-                        balance = balance + quantity;
+                        
 
                         const buyTransactions = operationsArr.filter((t: any, k: number) => {
                             // console.log(t['unit-cost'],keyObj,k, k <= keyObj && t.operation === "buy")
@@ -110,7 +110,7 @@ program
                         
                         const totalBuyTransactions = Number(buyTransactions.length)
 
-                        if ( totalBuyTransactions > 1 ) {
+                        if ( totalBuyTransactions > 1 && balance > 0 ) {
                             
                             // Calcular a média ponderada do custo unitário de cada operacao
                             const totalQuantity = buyTransactions.reduce((sum: any, t: any) => sum + t.quantity, 0);
@@ -118,15 +118,16 @@ program
                             const weightedAverageCost = totalQuantity > 0 ? totalCost / totalQuantity : 0;
 
                             averegeBuyPrice = Number(weightedAverageCost.toFixed(2))
-                            console.log(`Média ponderada de custo unitário para compras (transacao > 1): ${averegeBuyPrice}`);
+                            console.log(`Média ponderada de custo unitário para compras (transacao > 1): ${averegeBuyPrice} - balance: ${balance}`);
 
-                        } else if (totalBuyTransactions === 1) {
+                        } else {
                             
                             averegeBuyPrice = unit_cost
-                            console.log(`Média ponderada de custo unitário para compras (transacao = 1): ${averegeBuyPrice}`);
+                            console.log(`Média ponderada de custo unitário para compras (transacao = 1): ${averegeBuyPrice} - balance: ${balance}`);
                         }
 
                         
+                        balance += quantity;
 
                         /**
                          * 
@@ -135,7 +136,6 @@ program
                          * 
                          */
                     }
-                    console.log('balance: '+balance)
 
                     taxesArr.push( { tax } );
                     // console.log(operation,unit_cost,quantity)
