@@ -37,18 +37,15 @@ program
                 const operationsArr = JSON.parse(arrayStrings[i]);
                 let taxesArr: Record<string, number>[] = [];
 
-                let averegeBuyPrice = 0;
-
-                // let preventLoss = 0; // x >= 0
-                let currentLoss = 0; // x <= 0
-                let currentProfit = 0; // x >= 0
-
+                let averegeBuyPrice = 0; // media ponderada
+                let currentLoss = 0; // saldo de prejuizo              
+                let balance: number = 0; // saldo de compra x venda
 
                 // percorre cada objeto da operação ----------------
                 // for (const operationObj of operationsArr) {
                 for (const [keyObj, operationObj] of operationsArr.entries()) {
                     
-                    let tax: number = 0;
+                    let tax: number = 0;                  
                     const obj: Operation = operationObj;
 
                     // identifica cada propriedade (operation, unit-cost, quantity)
@@ -59,6 +56,9 @@ program
                     const operation_cost = unit_cost * quantity
                     
                     if (operation === 'sell') {
+
+                        // saldo de acoes
+                        balance = balance - quantity;
 
                         // calcula operacao de venda e compra
                         const operation_buy = averegeBuyPrice * quantity
@@ -101,6 +101,8 @@ program
 
                     } else if(operation === 'buy') {
 
+                        balance = balance + quantity;
+
                         const buyTransactions = operationsArr.filter((t: any, k: number) => {
                             // console.log(t['unit-cost'],keyObj,k, k <= keyObj && t.operation === "buy")
                             return t.operation === "buy" && k <= keyObj
@@ -128,13 +130,12 @@ program
 
                         /**
                          * 
-                         * nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-
-                         * atual) + (quantidade-de-acoes * valor-de-compra)) / (quantidade-de-acoes-atual + quantidade-
-                         * de-acoes-compradas)
+                         * nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-atual) + (quantidade-de-acoes * valor-de-compra)) 
+                         * / (quantidade-de-acoes-atual + quantidade-de-acoes-compradas)
                          * 
                          */
                     }
-
+                    console.log('balance: '+balance)
 
                     taxesArr.push( { tax } );
                     // console.log(operation,unit_cost,quantity)
