@@ -7,10 +7,28 @@ const program = new Command();
 //     console.log(`Operation: ${transaction.operation}, Unit Cost: ${transaction["unit-cost"]}, Quantity: ${transaction.quantity}`);
 // }
 
+// calcula lucro
+function calcProfit(operation_sell: number, operation_buy: number) {
+    return operation_sell - operation_buy;
+}
 
+// calcula lucro real (subtrai o prejuizo anterior se houver)
+function calcRealProfit(profit: number, currentLoss: number) {    
+    return (profit - currentLoss) >= 0 ? profit - currentLoss : 0 
+}
 
+// atualiza prejuizo anterior conforme lucro atual
+function updateLoss(profit:number, currentLoss: number) {
+    if (profit > 0 && currentLoss > 0) {
+        return (currentLoss > profit) ? currentLoss - profit : 0
+    }
+    return currentLoss
+}
 
-
+// calcula imposto (20% do lucro)
+function calcTax(operation_cost: number, real_profit: number) {
+    return operation_cost > 20000 ? ((real_profit * 20) / 100) : 0
+}
 
 
 program
@@ -65,17 +83,11 @@ program
                         if (unit_cost > averegeBuyPrice) {
                         // if (operation_buy > operation_sell) {
                             
-                            // calcula lucro
-                            const profit = operation_sell - operation_buy
-                            const real_profit = (profit - currentLoss) >= 0 ? profit - currentLoss : 0  // subtrai prejuizo anterior (se houver)
-
-                            // atualiza prejuizo anterior conforme lucro atual
-                            if (profit > 0 && currentLoss > 0) {
-                                currentLoss = (currentLoss > profit) ? currentLoss - profit : 0
-                            }
-
-                            // calcula imposto (20% do lucro)
-                            tax = operation_cost > 20000 ? ((real_profit * 20) / 100) : 0
+                            const profit = calcProfit(operation_sell, operation_buy)
+                            const real_profit = calcRealProfit(profit, currentLoss)
+                            
+                            currentLoss = updateLoss(profit, currentLoss)
+                            tax = calcTax(operation_cost, real_profit);
 
                             debug && console.log('teve lucro real: R$'+real_profit+' lucro: '+profit+ ' prejuizo atual: '+currentLoss+' tax: '+tax)
 
