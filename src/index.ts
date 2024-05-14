@@ -4,15 +4,10 @@ import * as fs from 'fs';
 const program = new Command();
 
 
-interface Operation {
-    "operation": string;
-    "unit-cost": number;
-    "quantity": number;
-}
 
-function processTransaction(transaction: Operation) {
-    console.log(`Operation: ${transaction.operation}, Unit Cost: ${transaction["unit-cost"]}, Quantity: ${transaction.quantity}`);
-}
+// function processTransaction(transaction: Operation) {
+//     console.log(`Operation: ${transaction.operation}, Unit Cost: ${transaction["unit-cost"]}, Quantity: ${transaction.quantity}`);
+// }
 
 program
     .version('1.0.0')
@@ -145,7 +140,7 @@ program
                 // --------- PRINT STDOUT
                 console.dir(taxesArr)
 
-
+                // data_stdout += taxesArr
 
                 // executar funcao aqui para todos os casos de uso
                 // data_stdout = operationsArr
@@ -156,29 +151,6 @@ program
             // console.dir(data_stdout)
             // processJsonData(data);
         });
-
-
-        // via streams
-        // const rl = readline.createInterface({
-        //     input: process.stdin,
-        //     output: process.stdout,
-        //     terminal: false
-        // });
-
-        // rl.on('line', (line) => {
-        //     // console.log('line: '+line);
-
-        //     // Corrigindo a entrada para tornar múltiplos arrays JSON válidos
-        //     const correctedLine = line.replace(/\]/g, '],');
-
-        //     try {
-        //         // Processa como um único grande array
-        //         const transactions: Transaction[] = JSON.parse(`[${correctedLine}]`);
-        //         transactions.forEach(processTransaction);
-        //     } catch (e) {
-        //         console.error('Error parsing JSON:', e);
-        //     }
-        // });
     });
 
 program.parse(process.argv);
