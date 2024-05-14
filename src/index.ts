@@ -1,7 +1,5 @@
 import { Command } from 'commander';
 import { Operation } from './types'
-// import * as readline from 'readline';
-// import * as fs from 'fs';
 
 const program = new Command();
 
@@ -9,13 +7,20 @@ const program = new Command();
 //     console.log(`Operation: ${transaction.operation}, Unit Cost: ${transaction["unit-cost"]}, Quantity: ${transaction.quantity}`);
 // }
 
+
+
+
+
+
+
 program
     .version('1.0.0')
     .description("Process JSON data from stdin")
     .command('process')
     .action((options) => {
 
-        let data_stdout: string[] = [];
+        const debug = false;
+
         process.stdin.on('data', (data_stdin) => {
 
             // Primeiro, adicionamos um delimitador confiável para dividir os arrays
@@ -56,10 +61,9 @@ program
                         const operation_buy = averegeBuyPrice * quantity
                         const operation_sell = unit_cost * quantity
 
-                        // calcula lucro ou prejuizo considerando prejuizo anterior                        
+                        // se lucro                     
                         if (unit_cost > averegeBuyPrice) {
                         // if (operation_buy > operation_sell) {
-                            // se lucro
                             
                             // calcula lucro
                             const profit = operation_sell - operation_buy
@@ -73,21 +77,21 @@ program
                             // calcula imposto (20% do lucro)
                             tax = operation_cost > 20000 ? ((real_profit * 20) / 100) : 0
 
-                            console.log('teve lucro real: R$'+real_profit+' lucro: '+profit+ ' prejuizo atual: '+currentLoss+' tax: '+tax)
+                            debug && console.log('teve lucro real: R$'+real_profit+' lucro: '+profit+ ' prejuizo atual: '+currentLoss+' tax: '+tax)
 
+                        // se prejuizo
                         } else if (unit_cost < averegeBuyPrice) {
-                            // se prejuizo
                             
                             // calcula prejuizo
                             currentLoss = operation_buy - operation_sell
 
                             tax = 0 // nao paga imposto por duas razões: teve prejuizo e/ou se for menor que 20K de operação
 
-                            console.log('teve prejuizo: '+currentLoss)
+                            debug && console.log('teve prejuizo: '+currentLoss)
 
                         } else {
                             // se nao ha lucro e nem prejuizo
-                            console.log('nao teve prejuizo e nem lucro')
+                            debug && console.log('nao teve prejuizo e nem lucro')
                         }
 
                         // saldo de acoes
@@ -99,7 +103,6 @@ program
                         
 
                         const buyTransactions = operationsArr.filter((t: any, k: number) => {
-                            // console.log(t['unit-cost'],keyObj,k, k <= keyObj && t.operation === "buy")
                             return t.operation === "buy" && k <= keyObj
                         });
                         
@@ -116,36 +119,25 @@ program
                             averegeBuyPrice = parseFloat( weightedAverageCost.toFixed(2) )
                             
                             // console.log( `((${balance} * ${averegeBuyPrice}) + (${quantity} * ${unit_cost})) / (${balance} + ${quantity})` )
-                            console.log(`Média ponderada de custo unitário para compras (transacao > 1): ${averegeBuyPrice} - balance: ${balance}`);
+                            debug && console.log(`Média ponderada de custo unitário para compras (transacao > 1): ${averegeBuyPrice} - balance: ${balance}`);
 
                         } else {
                             
                             averegeBuyPrice = unit_cost
-                            console.log(`Média ponderada de custo unitário para compras (transacao = 1 ou saldo = 0): ${averegeBuyPrice} - balance: ${balance}`);
+                            debug && console.log(`Média ponderada de custo unitário para compras (transacao = 1 ou saldo = 0): ${averegeBuyPrice} - balance: ${balance}`);
                         }
 
-                        
                         balance += quantity;
                     }
 
                     taxesArr.push( { tax } );
-                    // console.log(operation,unit_cost,quantity)
                 }
 
 
-                // --------- PRINT STDOUT
+                // --------- STDOUT
                 console.dir(taxesArr)
 
-                // data_stdout += taxesArr
-
-                // executar funcao aqui para todos os casos de uso
-                // data_stdout = operationsArr
             }
-        });
-
-        process.stdin.on('end', () => {
-            // console.dir(data_stdout)
-            // processJsonData(data);
         });
     });
 
