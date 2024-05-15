@@ -1,17 +1,9 @@
 import { Command } from 'commander';
 import { IOperation } from './types'
+import { OperationStatus } from './enums';
 
 const program = new Command();
 
-// function processTransaction(transaction: Operation) {
-//     console.log(`Operation: ${transaction.operation}, Unit Cost: ${transaction["unit-cost"]}, Quantity: ${transaction.quantity}`);
-// }
-
-enum OPERATION_STATUS {
-    Profit = 1,
-    Loss = -1,
-    noGainNoLoss = 0
-}
 
 // calcula lucro
 function calcProfit(operation_sell: number, operation_buy: number): number {
@@ -45,11 +37,11 @@ function checkStatus(unit_cost: number, averegeBuyPrice: number): number {
     // if (operation_buy > operation_sell) {
 
     if (unit_cost > averegeBuyPrice) 
-        return OPERATION_STATUS.Profit
+        return OperationStatus.Profit
     else if (unit_cost < averegeBuyPrice) 
-        return OPERATION_STATUS.Loss
+        return OperationStatus.Loss
     
-    return OPERATION_STATUS.noGainNoLoss
+    return OperationStatus.noGainNoLoss
 }
 
 // calcula qualquer operação (compra/venda atual ou médias gerais)
@@ -92,7 +84,7 @@ function calcTaxSell(currentLoss: number, unit_cost: number, quantity: number, a
 
     const { operation_cost, operation_buy, operation_status } = getOperationInfo(unit_cost, quantity, averegeBuyPrice)
 
-    if (operation_status === OPERATION_STATUS.Profit) {
+    if (operation_status === OperationStatus.Profit) {
         const profit = calcProfit(operation_cost, operation_buy)
         const real_profit = calcRealProfit(profit, currentLoss)
 
@@ -115,13 +107,13 @@ function getCurrentLoss(currentLoss: number, unit_cost: number, quantity: number
 
     const { operation_cost, operation_buy, operation_status } = getOperationInfo(unit_cost, quantity, averegeBuyPrice)
 
-    if (operation_status === OPERATION_STATUS.Profit) {
+    if (operation_status === OperationStatus.Profit) {
         
         newCurrentLoss = updateLoss(
                             calcProfit(operation_cost, operation_buy), 
                             currentLoss
                         )
-    } else if (operation_status === OPERATION_STATUS.Loss) {
+    } else if (operation_status === OperationStatus.Loss) {
 
         newCurrentLoss = calcLoss(operation_buy, operation_cost)
     } 
