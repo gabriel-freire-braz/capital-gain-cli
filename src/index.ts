@@ -87,6 +87,61 @@ function calcNewAverageBuyCost(qtdeBuyTransactions: number, currBalance: number,
     return averege
 }
 
+function calcTaxSell(currentLoss: number, unit_cost: number, quantity: number, averegeBuyPrice: number): number {
+    let newTax = 0;      
+
+    const { operation_cost, operation_buy, operation_status } = getOperationInfo(unit_cost, quantity, averegeBuyPrice)
+
+    if (operation_status === OPERATION_STATUS.Profit) {
+        const profit = calcProfit(operation_cost, operation_buy)
+        const real_profit = calcRealProfit(profit, currentLoss)
+
+        newTax = calcTax(operation_cost, real_profit)
+    } 
+
+    return newTax
+}
+
+function getOperationInfo(unit_cost: number, quantity: number, averegeBuyPrice: number): Record<string, number> {
+    return {
+        operation_cost: calcOperation(unit_cost, quantity),
+        operation_buy: calcOperation(averegeBuyPrice, quantity),
+        operation_status: checkStatus(unit_cost, averegeBuyPrice) // lucro ou prejuizo
+    }
+}
+
+function getCurrentLoss(currentLoss: number, unit_cost: number, quantity: number, averegeBuyPrice: number): number {
+    let newCurrentLoss = currentLoss;
+
+    const { operation_cost, operation_buy, operation_status } = getOperationInfo(unit_cost, quantity, averegeBuyPrice)
+
+    if (operation_status === OPERATION_STATUS.Profit) {
+        
+        newCurrentLoss = updateLoss(
+                            calcProfit(operation_cost, operation_buy), 
+                            currentLoss
+                        )
+    } else if (operation_status === OPERATION_STATUS.Loss) {
+
+        newCurrentLoss = calcLoss(operation_buy, operation_cost)
+    } 
+
+    return newCurrentLoss
+}
+
+
+function updateBalance(currBalance: number, quantity: number, operation: string): number {
+
+    if (operation === "buy")
+        return currBalance + quantity // somar saldo de acoes na compra
+
+    else if (operation === "sell")
+        return currBalance - quantity // subtrair saldo de acoes na venda
+
+    return 0
+}
+
+
 program
     .version('1.0.0')
     .description("Process JSON data from stdin")
@@ -109,6 +164,7 @@ program
             
                 // Converter cada string de array JSON em um array de objetos JavaScript
                 const operationsArr = JSON.parse(arrayStrings[i]);
+                
                 let taxesArr: Record<string, number>[] = [];
 
                 let averegeBuyPrice = 0; // media ponderada
@@ -121,46 +177,27 @@ program
                     
                     const { operation, 'unit-cost': unit_cost, quantity }: Operation = operationObj
 
-                    let tax: number = 0;                  
+                    let tax = 0;                  
                     
                     
                     if (operation === 'sell') {
 
-                        const operation_cost = calcOperation(unit_cost, quantity)
-                        const operation_buy = calcOperation(averegeBuyPrice, quantity)
-                        const operation_status = checkStatus(unit_cost, averegeBuyPrice) // lucro ou prejuizo
-
-                        if (operation_status === OPERATION_STATUS.Profit) {
-                            const profit = calcProfit(operation_cost, operation_buy)
-                            const real_profit = calcRealProfit(profit, currentLoss)
-
-                            currentLoss = updateLoss(profit, currentLoss)
-                            tax = calcTax(operation_cost, real_profit)
-
-                            debug && console.log('teve lucro real: R$'+real_profit+' lucro: '+profit+ ' prejuizo atual: '+currentLoss+' tax: '+tax)
-                        } 
-                        
-                        if (operation_status === OPERATION_STATUS.Loss) {
-                            currentLoss = calcLoss(operation_buy, operation_cost)
-                            debug && console.log('teve prejuizo: '+currentLoss)
-                        } 
-
-                        if (operation_status === OPERATION_STATUS.noGainNoLoss) {
-                            debug && console.log('nao teve prejuizo e nem lucro')
-                        }
-
-                        // saldo de acoes
-                        balance -= quantity;
+                        tax = calcTaxSell(currentLoss, unit_cost, quantity, averegeBuyPrice)                        
+                        currentLoss = getCurrentLoss(currentLoss, unit_cost, quantity, averegeBuyPrice)
 
 
                     } else if(operation === 'buy') {
 
-                        const qtdeBuyTransactions: number = getQtdeBuyTransactions(operationsArr, keyObj)
-                        
-                        averegeBuyPrice = calcNewAverageBuyCost(qtdeBuyTransactions, balance, averegeBuyPrice, unit_cost, quantity)
-
-                        balance += quantity;
+                        averegeBuyPrice = calcNewAverageBuyCost(
+                                                getQtdeBuyTransactions(operationsArr, keyObj), 
+                                                balance, 
+                                                averegeBuyPrice, 
+                                                unit_cost, 
+                                                quantity
+                                            )
                     }
+
+                    balance = updateBalance(balance, quantity, operation)
 
                     taxesArr.push( { tax } );
                 }
