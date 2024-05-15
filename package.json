@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "test": "vitest",
     "build": "tsc",
     "cli": "tsc && node dist/index.js process",
     "cli-dev": "nodemon src/index.ts process"
@@ -13,7 +14,8 @@
     "nodemon": "^3.1.0",
     "ts-node": "^10.9.2",
     "tsc": "^2.0.4",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
   },
   "name": "capital-gain-cli",
   "version": "1.0.0",

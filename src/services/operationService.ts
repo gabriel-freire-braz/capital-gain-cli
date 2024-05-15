@@ -168,4 +168,4 @@ function getTaxesStdOut(operationsArr: []): Record<string, number>[] {
     return taxesArr
 }
 
-export { getTaxesStdOut }
+export { getTaxesStdOut, updateBalance }
