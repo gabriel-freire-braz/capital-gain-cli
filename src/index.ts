@@ -52,8 +52,39 @@ function checkStatus(unit_cost: number, averegeBuyPrice: number): number {
     return OPERATION_STATUS.noGainNoLoss
 }
 
+// calcula qualquer operação (compra/venda atual ou médias gerais)
 function calcOperation(unit_cost: number, quantity: number): number {
     return unit_cost * quantity
+}
+
+function getQtdeBuyTransactions(operationsArr: [], currKeyOperation: number): number {
+    const buyTransactions = operationsArr.filter((t: any, k: number) => {
+        return t.operation === "buy" && k <= currKeyOperation
+    });
+
+    return Number(buyTransactions.length)
+}
+
+function hasAbleToCalcAverageBuy(qtdeBuyTransactions: number, currBalance: number) {
+    return  qtdeBuyTransactions > 1 && currBalance > 0
+}
+
+function calcNewAverageBuyCost(qtdeBuyTransactions: number, currBalance: number, currAverageBuyCost: number, currUnitCost: number, currQuantity: number): number {
+    let averege = currUnitCost
+
+    const hasAbleToCalc = hasAbleToCalcAverageBuy(qtdeBuyTransactions, currBalance)
+
+    if ( hasAbleToCalc ) {
+        const operation_overall = calcOperation(currBalance, currAverageBuyCost)
+        const operation_cost = calcOperation(currUnitCost, currQuantity)                            
+
+        // nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-atual) + (quantidade-de-acoes * valor-de-compra)) / (quantidade-de-acoes-atual + quantidade-de-acoes-compradas)
+        const weightedAverageCost = ( operation_overall + operation_cost ) / (currBalance + currQuantity) 
+        
+        averege = parseFloat( weightedAverageCost.toFixed(2) )
+    }
+
+    return averege
 }
 
 program
@@ -124,33 +155,9 @@ program
 
                     } else if(operation === 'buy') {
 
-                        const buyTransactions = operationsArr.filter((t: any, k: number) => {
-                            return t.operation === "buy" && k <= keyObj
-                        });
-
-                        const totalBuyTransactions = Number(buyTransactions.length)
-
-                        if ( totalBuyTransactions > 1 && balance > 0 ) {
-                            
-                            //
-                            // Calcular a média ponderada do custo unitário de cada operacao
-                            // nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-atual) + (quantidade-de-acoes * valor-de-compra)) / (quantidade-de-acoes-atual + quantidade-de-acoes-compradas)
-                            //
-                            const operation_overall = calcOperation(balance, averegeBuyPrice)
-                            const operation_cost = calcOperation(unit_cost, quantity)                            
-
-                            const weightedAverageCost = ( operation_overall + operation_cost ) / (balance + quantity)
-                            
-                            averegeBuyPrice = parseFloat( weightedAverageCost.toFixed(2) )
-                            
-                            // console.log( `((${balance} * ${averegeBuyPrice}) + (${quantity} * ${unit_cost})) / (${balance} + ${quantity})` )
-                            debug && console.log(`Média ponderada de custo unitário para compras (transacao > 1): ${averegeBuyPrice} - balance: ${balance}`);
-
-                        } else {
-                            
-                            averegeBuyPrice = unit_cost
-                            debug && console.log(`Média ponderada de custo unitário para compras (transacao = 1 ou saldo = 0): ${averegeBuyPrice} - balance: ${balance}`);
-                        }
+                        const qtdeBuyTransactions: number = getQtdeBuyTransactions(operationsArr, keyObj)
+                        
+                        averegeBuyPrice = calcNewAverageBuyCost(qtdeBuyTransactions, balance, averegeBuyPrice, unit_cost, quantity)
 
                         balance += quantity;
                     }
@@ -161,7 +168,6 @@ program
 
                 // --------- STDOUT
                 console.dir(taxesArr)
-
             }
         });
     });
