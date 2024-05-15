@@ -7,8 +7,14 @@ const program = new Command();
 //     console.log(`Operation: ${transaction.operation}, Unit Cost: ${transaction["unit-cost"]}, Quantity: ${transaction.quantity}`);
 // }
 
+enum OPERATION_STATUS {
+    Profit = 1,
+    Loss = -1,
+    noGainNoLoss = 0
+}
+
 // calcula lucro
-function calcProfit(operation_sell: number, operation_buy: number) {
+function calcProfit(operation_sell: number, operation_buy: number): number {
     return operation_sell - operation_buy;
 }
 
@@ -17,8 +23,8 @@ function calcRealProfit(profit: number, currentLoss: number) {
     return (profit - currentLoss) >= 0 ? profit - currentLoss : 0 
 }
 
-// atualiza prejuizo anterior conforme lucro atual
-function updateLoss(profit:number, currentLoss: number) {
+// atualiza prejuizo conforme lucro da operação atual
+function updateLoss(profit:number, currentLoss: number): number {
     if (profit > 0 && currentLoss > 0) {
         return (currentLoss > profit) ? currentLoss - profit : 0
     }
@@ -26,10 +32,29 @@ function updateLoss(profit:number, currentLoss: number) {
 }
 
 // calcula imposto (20% do lucro)
-function calcTax(operation_cost: number, real_profit: number) {
+function calcTax(operation_cost: number, real_profit: number): number {
     return operation_cost > 20000 ? ((real_profit * 20) / 100) : 0
 }
 
+// calcula prejuizo
+function calcLoss(operation_buy: number, operation_sell: number): number {
+    return operation_buy - operation_sell
+}
+
+function checkStatus(unit_cost: number, averegeBuyPrice: number): number {
+    // if (operation_buy > operation_sell) {
+
+    if (unit_cost > averegeBuyPrice) 
+        return OPERATION_STATUS.Profit
+    else if (unit_cost < averegeBuyPrice) 
+        return OPERATION_STATUS.Loss
+    
+    return OPERATION_STATUS.noGainNoLoss
+}
+
+function calcOperation(unit_cost: number, quantity: number): number {
+    return unit_cost * quantity
+}
 
 program
     .version('1.0.0')
@@ -63,46 +88,33 @@ program
                 // for (const operationObj of operationsArr) {
                 for (const [keyObj, operationObj] of operationsArr.entries()) {
                     
+                    const { operation, 'unit-cost': unit_cost, quantity }: Operation = operationObj
+
                     let tax: number = 0;                  
-                    const obj: Operation = operationObj;
-
-                    // identifica cada propriedade (operation, unit-cost, quantity)
-                    const operation: string = obj['operation']
-                    const unit_cost: number = obj['unit-cost']
-                    const quantity: number = obj['quantity']
-
-                    const operation_cost = unit_cost * quantity
+                    
                     
                     if (operation === 'sell') {
 
-                        // calcula operacao de venda e compra
-                        const operation_buy = averegeBuyPrice * quantity
-                        const operation_sell = unit_cost * quantity
+                        const operation_cost = calcOperation(unit_cost, quantity)
+                        const operation_buy = calcOperation(averegeBuyPrice, quantity)
+                        const operation_status = checkStatus(unit_cost, averegeBuyPrice) // lucro ou prejuizo
 
-                        // se lucro                     
-                        if (unit_cost > averegeBuyPrice) {
-                        // if (operation_buy > operation_sell) {
-                            
-                            const profit = calcProfit(operation_sell, operation_buy)
+                        if (operation_status === OPERATION_STATUS.Profit) {
+                            const profit = calcProfit(operation_cost, operation_buy)
                             const real_profit = calcRealProfit(profit, currentLoss)
-                            
+
                             currentLoss = updateLoss(profit, currentLoss)
-                            tax = calcTax(operation_cost, real_profit);
+                            tax = calcTax(operation_cost, real_profit)
 
                             debug && console.log('teve lucro real: R$'+real_profit+' lucro: '+profit+ ' prejuizo atual: '+currentLoss+' tax: '+tax)
-
-                        // se prejuizo
-                        } else if (unit_cost < averegeBuyPrice) {
-                            
-                            // calcula prejuizo
-                            currentLoss = operation_buy - operation_sell
-
-                            tax = 0 // nao paga imposto por duas razões: teve prejuizo e/ou se for menor que 20K de operação
-
+                        } 
+                        
+                        if (operation_status === OPERATION_STATUS.Loss) {
+                            currentLoss = calcLoss(operation_buy, operation_cost)
                             debug && console.log('teve prejuizo: '+currentLoss)
+                        } 
 
-                        } else {
-                            // se nao ha lucro e nem prejuizo
+                        if (operation_status === OPERATION_STATUS.noGainNoLoss) {
                             debug && console.log('nao teve prejuizo e nem lucro')
                         }
 
@@ -112,12 +124,10 @@ program
 
                     } else if(operation === 'buy') {
 
-                        
-
                         const buyTransactions = operationsArr.filter((t: any, k: number) => {
                             return t.operation === "buy" && k <= keyObj
                         });
-                        
+
                         const totalBuyTransactions = Number(buyTransactions.length)
 
                         if ( totalBuyTransactions > 1 && balance > 0 ) {
@@ -126,7 +136,10 @@ program
                             // Calcular a média ponderada do custo unitário de cada operacao
                             // nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-atual) + (quantidade-de-acoes * valor-de-compra)) / (quantidade-de-acoes-atual + quantidade-de-acoes-compradas)
                             //
-                            const weightedAverageCost = ( (balance * averegeBuyPrice) + operation_cost ) / (balance + quantity)
+                            const operation_overall = calcOperation(balance, averegeBuyPrice)
+                            const operation_cost = calcOperation(unit_cost, quantity)                            
+
+                            const weightedAverageCost = ( operation_overall + operation_cost ) / (balance + quantity)
                             
                             averegeBuyPrice = parseFloat( weightedAverageCost.toFixed(2) )
                             
