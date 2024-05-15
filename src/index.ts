@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { getTaxesStdOut } from './services/operationService';
+import { IOperation } from './types';
 
 
 const program = new Command();
@@ -21,7 +22,8 @@ program
             // percorre cada lista/linha de operação (cada iteração tem lógica independente)
             for (let i = 0; i < arrayStrings.length; i++) {
             
-                const operationsArr = JSON.parse(arrayStrings[i]);
+                const operationsArr: IOperation[] = JSON.parse(arrayStrings[i]);
+                
                 const taxesStdOut: Record<string, number>[] = getTaxesStdOut(operationsArr)
 
                 // --------- STDOUT
