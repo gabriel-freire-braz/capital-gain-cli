@@ -27,7 +27,7 @@ export function calcTax(operation_cost: number, real_profit: number): number {
 
 // calcula prejuizo
 export function calcLoss(operation_buy: number, operation_sell: number): number {
-    return operation_buy - operation_sell
+    return operation_buy > operation_sell ? operation_buy - operation_sell : 0
 }
 
 export function checkStatus(unit_cost: number, averegeBuyPrice: number): number {
@@ -46,7 +46,7 @@ export function calcOperation(unit_cost: number, quantity: number): number {
     return unit_cost * quantity
 }
 
-export function getQtdeBuyTransactions(operationsArr: [], currKeyOperation: number): number {
+export function getQtdeBuyTransactions(operationsArr: IOperation[], currKeyOperation: number): number {
     const buyTransactions = operationsArr.filter((t: any, k: number) => {
         return t.operation === "buy" && k <= currKeyOperation
     });
@@ -54,13 +54,13 @@ export function getQtdeBuyTransactions(operationsArr: [], currKeyOperation: numb
     return Number(buyTransactions.length)
 }
 
-export function hasAbleToCalcAverageBuy(qtdeBuyTransactions: number, currBalance: number) {
+export function hasAbleToCalcAverageBuy(qtdeBuyTransactions: number, currBalance: number): boolean {
     return  qtdeBuyTransactions > 1 && currBalance > 0
 }
 
 export function calcNewAverageBuyCost(qtdeBuyTransactions: number, currBalance: number, currAverageBuyCost: number, currUnitCost: number, currQuantity: number): number {
     let averege = currUnitCost
-
+    
     const hasAbleToCalc = hasAbleToCalcAverageBuy(qtdeBuyTransactions, currBalance)
 
     if ( hasAbleToCalc ) {
@@ -70,8 +70,8 @@ export function calcNewAverageBuyCost(qtdeBuyTransactions: number, currBalance: 
         // nova-media-ponderada = ((quantidade-de-acoes-atual * media-ponderada-atual) + (quantidade-de-acoes * valor-de-compra)) / (quantidade-de-acoes-atual + quantidade-de-acoes-compradas)
         const weightedAverageCost = ( operation_overall + operation_cost ) / (currBalance + currQuantity) 
         
-        averege = parseFloat( weightedAverageCost.toFixed(2) )
-    }
+        averege = parseFloat( weightedAverageCost.toFixed(2) )        
+    }    
 
     return averege
 }
@@ -129,7 +129,7 @@ export function updateBalance(currBalance: number, quantity: number, operation: 
     return 0
 }
 
-export function getTaxesStdOut(operationsArr: []): Record<string, number>[] {
+export function getTaxesStdOut(operationsArr: IOperation[]): Record<string, number>[] {
     let taxesArr: Record<string, number>[] = [];
 
     let averegeBuyPrice = 0; // media ponderada
