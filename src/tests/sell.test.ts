@@ -1,11 +1,18 @@
 import { describe, it, expect } from 'vitest';
 import { updateBalance } from '../services/operationService';
 
+
+
 describe('sum function', () => {
   it('update current balance', () => {
     expect(updateBalance(1, 2, "buy")).toBe(3);
   });
 });
+
+
+
+
+
 
 /**
  * 
