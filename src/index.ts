@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { Operation } from './types'
+import { IOperation } from './types'
 
 const program = new Command();
 
@@ -141,14 +141,53 @@ function updateBalance(currBalance: number, quantity: number, operation: string)
     return 0
 }
 
+function getTaxes(operationsArr: []): Record<string, number>[] {
+    let taxesArr: Record<string, number>[] = [];
+
+    let averegeBuyPrice = 0; // media ponderada
+    let currentLoss = 0; // saldo de prejuizo              
+    let balance = 0; // saldo de compra x venda
+
+    // for (const operationObj of operationsArr) {
+    for (const [keyObj, operationObj] of operationsArr.entries()) {
+        
+        const { operation, 'unit-cost': unit_cost, quantity }: IOperation = operationObj
+
+        let tax = 0;                  
+        
+        
+        if (operation === 'sell') {
+
+            tax = calcTaxSell(currentLoss, unit_cost, quantity, averegeBuyPrice)                        
+            currentLoss = getCurrentLoss(currentLoss, unit_cost, quantity, averegeBuyPrice)
+            balance = updateBalance(balance, quantity, operation)
+
+
+        } else if(operation === 'buy') {
+
+            averegeBuyPrice = calcNewAverageBuyCost(
+                                    getQtdeBuyTransactions(operationsArr, keyObj), 
+                                    balance, 
+                                    averegeBuyPrice, 
+                                    unit_cost, 
+                                    quantity
+                                )
+            balance = updateBalance(balance, quantity, operation)
+        }
+
+        taxesArr.push( { tax } );
+    }
+    return taxesArr
+}
+
+
+
 
 program
     .version('1.0.0')
     .description("Process JSON data from stdin")
     .command('process')
     .action((options) => {
-
-        const debug = false;
 
         process.stdin.on('data', (data_stdin) => {
 
@@ -158,50 +197,11 @@ program
             // Agora, divida a string corrigida no delimitador para obter cada array JSON como uma string separada
             const arrayStrings: string[] = correctedString.split('|');
 
-
-            // percorre cada lista/linha de operação (cada iteração tem lógica independente) ----------------
+            // percorre cada lista/linha de operação (cada iteração tem lógica independente)
             for (let i = 0; i < arrayStrings.length; i++) {
             
-                // Converter cada string de array JSON em um array de objetos JavaScript
                 const operationsArr = JSON.parse(arrayStrings[i]);
-                
-                let taxesArr: Record<string, number>[] = [];
-
-                let averegeBuyPrice = 0; // media ponderada
-                let currentLoss = 0; // saldo de prejuizo              
-                let balance = 0; // saldo de compra x venda
-
-                // percorre cada objeto da operação ----------------
-                // for (const operationObj of operationsArr) {
-                for (const [keyObj, operationObj] of operationsArr.entries()) {
-                    
-                    const { operation, 'unit-cost': unit_cost, quantity }: Operation = operationObj
-
-                    let tax = 0;                  
-                    
-                    
-                    if (operation === 'sell') {
-
-                        tax = calcTaxSell(currentLoss, unit_cost, quantity, averegeBuyPrice)                        
-                        currentLoss = getCurrentLoss(currentLoss, unit_cost, quantity, averegeBuyPrice)
-
-
-                    } else if(operation === 'buy') {
-
-                        averegeBuyPrice = calcNewAverageBuyCost(
-                                                getQtdeBuyTransactions(operationsArr, keyObj), 
-                                                balance, 
-                                                averegeBuyPrice, 
-                                                unit_cost, 
-                                                quantity
-                                            )
-                    }
-
-                    balance = updateBalance(balance, quantity, operation)
-
-                    taxesArr.push( { tax } );
-                }
-
+                const taxesArr: Record<string, number>[] = getTaxes(operationsArr)
 
                 // --------- STDOUT
                 console.dir(taxesArr)
