@@ -7,5 +7,7 @@
 
 ## run
 
-     yarn tsc && (cat src/operations/case1.json; cat src/operations/case2.json) | node dist/index.js
-     yarn tsc && node dist/index.js < src/operations/case4.json 
+     cat src/operations/case1.json | yarn cli
+     cat src/operations/case1.json src/operations/case2.json | yarn cli
+
+     echo '<stdinValue>' | yarn cli
