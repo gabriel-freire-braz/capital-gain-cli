@@ -3,28 +3,31 @@
 Programa de linha de comando (CLI) que calcula o imposto a ser pago sobre lucros ou prejuízos de operações no mercado financeiro de ações.  
 
 Este documento apresenta uma visão geral das principais decisões técnicas e arquiteturais adotadas durante o desenvolvimento da aplicação. Optamos por uma abordagem que enfatiza a simplicidade, a elegância e a eficiência, aderindo a princípios de design de software reconhecidos para garantir uma solução robusta e confiável.
-  
+
+Todos os casos de uso da proposta de requisitos estão no diretório `src/operations` em arquivos `json`, todos são adaptáveis para execução de comandos CLI diretamente via terminal e também são utilizados para os testes unitários. Porém deixamos a opção de inputar os dados de forma independente via terminal caso desejado.
 
 ## Tecnologias
 
-NodeJS + Typescript. 
+NodeJS + Typescript + Vitest. 
  
 
 ## Get started
 
-### Baixar as dependências e compilar a aplicação
+### Baixar dependências e compilar a aplicação
 
     yarn install && yarn build
   
 ### Executar o comando CLI 
-  
+
+Executar linha de comando `stdin` via arquivo
+
     cat src/operations/case1.json | yarn cli
    
-Para executar mais de um arquivo como stdin, adicione um após o outro separadamente por espaços em branco:
+Para executar mais de um arquivo, adicione um após o outro separados por espaços em branco:
 
     cat src/operations/case1.json src/operations/case2.json | yarn cli
   
-Ou adicione o valor de stdin explicitamente via terminal
+Ou adicione o valor de stdin explicitamente via terminal (substituir `<stdinValue>` pelo dado de entrada):
   
     echo '<stdinValue>' | yarn cli
    
@@ -51,16 +54,16 @@ Você verá a execução dos testes unitários com Vitest:
 
 - **Gerenciamento de Memória**: Optamos por gerenciar o estado da aplicação em memória através de variáveis de escopo bem definidas. Isso nos permite ter um controle mais direto sobre o uso da memória, evitando overhead de gerenciamento de estado externo e aumentando a performance da aplicação.
 
-- **Testes unitários**: Nossa abordagem para testes é rigorosa e abrangente. Testamos cada componente de forma isolada (testes unitários) e em conjunto (testes de integração) para garantir que todos os aspectos da aplicação funcionem como esperado. Os testes são uma parte integral do nosso processo de desenvolvimento e nos ajudam a manter a qualidade e a estabilidade do software.
+- **Testes unitários**: Testamos cada componente de forma isolada (testes unitários) para garantir que todos os aspectos da aplicação funcionem como esperado. Escolhemos o Vitest pois é um framework moderno, eficiente e rápido.
 
 - **Simplicidade e Elegância**: Durante o desenvolvimento, priorizamos a simplicidade e a elegância. Evitamos instalar ou configurar mais do que é estritamente necessário para resolver o problema em questão. Isso não apenas torna nossa aplicação mais leve e fácil de entender, mas também minimiza o risco de erros e problemas de compatibilidade.
 
 - **Resolução de Problemas**: A finalidade última da nossa aplicação é resolver o problema proposto de maneira eficiente e eficaz. Cada decisão técnica e arquitetural foi tomada com esse objetivo em mente, garantindo que a solução final seja não apenas tecnicamente viável, mas também prática e útil para os usuários finais.
   
 
-## Bibliotecas
+## Bibliotecas e frameworks
 
-### commander
+### Commander
 
 A biblioteca Commander é uma das ferramentas mais populares para a criação de interfaces de linha de comando (CLI) em Node.js, ela simplifica o processo de interpretação de argumentos de linha de comando, facilitando a criação de aplicativos CLI robustos e fáceis de usar.
 
@@ -72,7 +75,11 @@ Utilizar a biblioteca Commander em vez de depender apenas das funcionalidades st
 4. Extensibilidade: Facilita a adição e modificação de comandos devido à sua estrutura modular, permitindo que o CLI cresça de forma organizada.
 5. Manutenção e Clareza: Produz código mais legível e fácil de manter, ajudando no onboarding de novos desenvolvedores e na manutenção de longo prazo.
 6. Facilidade de Testes: Simplifica a simulação de entradas de comandos em testes, permitindo focar na lógica de negócio em vez da infraestrutura de entrada.
+    
+### Vitest
   
+Escolhemos o Vitest como nossa ferramenta de teste para nossa aplicação CLI em TypeScript devido a várias características importantes que alinham com as necessidades do nosso projeto. Primeiramente, o Vitest é extremamente rápido, graças à sua integração com o esbuild, o que acelera significativamente a compilação de TypeScript e a execução dos testes. Isso é crucial para manter a agilidade e eficiência do nosso ciclo de desenvolvimento, permitindo que a equipe obtenha feedback instantâneo sobre as mudanças feitas no código.
+   
 
 ## Implementação técnica futura
 
