@@ -2,7 +2,7 @@
 
 Programa de linha de comando (CLI) que calcula o imposto a ser pago sobre lucros ou prejuízos de operações no mercado financeiro de ações.  
 
-Este documento apresenta uma visão geral das principais decisões técnicas e arquiteturais adotadas durante o desenvolvimento da aplicação. Optamos por uma abordagem que enfatiza a simplicidade, a elegância e a eficiência, aderindo a princípios de design de software reconhecidos para garantir uma solução robusta e confiável.
+Este documento apresenta uma visão geral das principais decisões técnicas e arquiteturais adotadas durante o desenvolvimento da aplicação, bem como todas as informações consideradas relevantes para compreensão e execução do programa. 
 
 Todos os casos de uso da proposta de requisitos estão no diretório `src/operations` em arquivos `json`, todos são adaptáveis para execução de comandos CLI diretamente via terminal e também são utilizados para os testes unitários. Porém deixamos a opção de inputar os dados de forma independente via terminal caso desejado.
 
@@ -32,7 +32,7 @@ Ou adicione o valor de stdin explicitamente via terminal (substituir `<stdinValu
     echo '<stdinValue>' | yarn cli
    
 
-## Teste a solução
+## Testar a solução
 
     yarn test
 
