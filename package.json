@@ -2,7 +2,7 @@
   "scripts": {
     "test": "vitest",
     "build": "tsc",
-    "cli": "tsc && node dist/index.js process",
+    "cli": "node dist/index.js process",
     "cli-dev": "nodemon src/index.ts process"
   },
   "dependencies": {
