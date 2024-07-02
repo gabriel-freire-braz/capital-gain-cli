@@ -24,7 +24,7 @@ program
             
                 const operationsArr: IOperation[] = JSON.parse(arrayStrings[i]);
                 
-                const taxesStdOut: Record<string, number>[] = getTaxesStdOut(operationsArr)
+                const taxesStdOut: Record<string, number | string>[] = getTaxesStdOut(operationsArr)
 
                 // --------- STDOUT
                 console.dir(taxesStdOut)

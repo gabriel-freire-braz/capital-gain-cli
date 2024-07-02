@@ -129,8 +129,9 @@ export function updateBalance(currBalance: number, quantity: number, operation: 
     return 0
 }
 
-export function getTaxesStdOut(operationsArr: IOperation[]): Record<string, number>[] {
-    let taxesArr: Record<string, number>[] = [];
+export function getTaxesStdOut(operationsArr: IOperation[]): Record<string, number | string>[] {
+    let taxesArr: Record<string, number | string>[] = [];
+    let errorsArr: Record<string, string> = {};
 
     let averegeBuyPrice = 0; // media ponderada
     let currentLoss = 0; // saldo de prejuizo              
@@ -141,10 +142,16 @@ export function getTaxesStdOut(operationsArr: IOperation[]): Record<string, numb
         
         const { operation, 'unit-cost': unit_cost, quantity }: IOperation = operationObj
 
-        let tax = 0;                  
-        
+        let tax = 0;       
         
         if (operation === 'sell') {
+
+            if (quantity > balance) {
+                errorsArr = {"error":"Can't sell more stocks than you have"};                
+
+                taxesArr.push( errorsArr );
+                continue;
+            }
 
             tax = calcTaxSell(currentLoss, unit_cost, quantity, averegeBuyPrice)                        
             currentLoss = getCurrentLoss(currentLoss, unit_cost, quantity, averegeBuyPrice)
@@ -165,5 +172,6 @@ export function getTaxesStdOut(operationsArr: IOperation[]): Record<string, numb
 
         taxesArr.push( { tax } );
     }
+
     return taxesArr
 }
